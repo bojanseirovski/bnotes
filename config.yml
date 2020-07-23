@@ -1,0 +1,10 @@
+# Server configurations
+server:
+  host: "localhost"
+  port: 3306
+
+# Database credentials
+database:
+  name: "bnotes"
+  user: "root"
+  pass: "root"
