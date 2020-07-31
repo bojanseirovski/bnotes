@@ -4,6 +4,7 @@ import (
 	"bojanseirovski/bnotes/Models"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +35,11 @@ func CreateUser(c *gin.Context) {
 
 //GetUserByID ... Get the user by id
 func GetUserByID(c *gin.Context) {
-	id := c.Params.ByName("id")
+	id, errUser := strconv.Atoi(c.Params.ByName("id"))
+	if errUser != nil {
+		fmt.Println(errUser.Error())
+		c.AbortWithStatus(http.StatusNotFound)
+	}
 	var user Models.User
 	err := Models.GetUserByID(&user, id)
 	if err != nil {
@@ -47,7 +52,11 @@ func GetUserByID(c *gin.Context) {
 //UpdateUser ... Update the user information
 func UpdateUser(c *gin.Context) {
 	var user Models.User
-	id := c.Params.ByName("id")
+	id, errUser := strconv.Atoi(c.Params.ByName("id"))
+	if errUser != nil {
+		fmt.Println(errUser.Error())
+		c.AbortWithStatus(http.StatusNotFound)
+	}
 	err := Models.GetUserByID(&user, id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, user)
@@ -64,11 +73,15 @@ func UpdateUser(c *gin.Context) {
 //DeleteUser ... Delete the user
 func DeleteUser(c *gin.Context) {
 	var user Models.User
-	id := c.Params.ByName("id")
+	var id, errID = strconv.Atoi(c.Params.ByName("id"))
+	if errID != nil {
+		fmt.Println(errID.Error())
+		c.AbortWithStatus(http.StatusNotFound)
+	}
 	err := Models.DeleteUser(&user, id)
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
-		c.JSON(http.StatusOK, gin.H{"id" + id: "is deleted"})
+		c.JSON(http.StatusOK, gin.H{"id" + strconv.Itoa(id): "is deleted"})
 	}
 }

@@ -22,6 +22,14 @@ func GetPointsByUID(point *[]Point, id int) (err error) {
 	return nil
 }
 
+//GetPointsByUIDandInterval ... Fetch all points by uid, between dates provided(start, end)
+func GetPointsByUIDandInterval(point *[]Point, id int, start string, end string) (err error) {
+	if err = Config.DB.Where("uid = ? and (date>=? and date<=?)", id, start, end).Find(point).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 //DeletePoint ... Delete user
 func DeletePoint(point *Point, id int) (err error) {
 	Config.DB.Where("id = ?", id).Delete(point)

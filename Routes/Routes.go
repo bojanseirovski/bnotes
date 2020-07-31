@@ -12,12 +12,31 @@ func SetupRouter() *gin.Engine {
 	grp1 := r.Group("/api")
 	{
 		grp1.GET("user", Controllers.GetUsers)
+
+		//	Manage user
 		grp1.POST("user", Controllers.CreateUser)
 		grp1.GET("user/:id", Controllers.GetUserByID)
-		grp1.GET("user/:id/points", Controllers.GetPoints)
-		grp1.POST("user/:id/points", Controllers.AddPoint)
 		grp1.PUT("user/:id", Controllers.UpdateUser)
 		grp1.DELETE("user/:id", Controllers.DeleteUser)
+		//	list/add user points
+		grp1.GET("user/:id/points", Controllers.GetPoints)
+		grp1.POST("user/:id/points", Controllers.AddPoint)
+
+		//	create a challenge
+		grp1.POST("challenge", Controllers.AddChallenge)
+		//	list all challenges
+		grp1.GET("challenge", Controllers.GetChallenges)
+		//	list all users per challenge
+		grp1.GET("challenge/:id/user", Controllers.GetChallengeUsers)
+		//	add user to challenge
+		grp1.PUT("challenge/:cid/user/:uid", Controllers.AdduserToChallenge)
+
+		//	list all user points for challenge
+		grp1.GET("challenge/:id/user/:uid", Controllers.GetChallengeUserPoints)
+
+		//	list total challenge points
+		grp1.GET("challenge/:id/points", Controllers.GetPoints)
 	}
+
 	return r
 }
