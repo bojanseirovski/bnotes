@@ -9,6 +9,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type CResp struct {
+	Challenges      []Models.ChallengeUser
+	TotalChallenges int
+}
+
+type UResp struct {
+	Id          uint   `json:"id"`
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	Phone       string `json:"phone"`
+	Address     string `json:"address"`
+	TotalPoints int    `json:"totalpoints"`
+}
+
 //GetUsers ... Get all users
 func GetUsers(c *gin.Context) {
 	var user []Models.User
@@ -16,7 +30,31 @@ func GetUsers(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
-		c.JSON(http.StatusOK, user)
+
+		var usersOut []UResp
+		var oneUserOut UResp
+		sumPoints := 0
+
+		for cUs := 0; cUs < len(user); cUs++ {
+			sumPoints = 0
+			var allPoints []Models.Point
+			Models.GetPointsByUID(&allPoints, int(user[cUs].Id))
+
+			for countI := 0; countI < len(allPoints); countI++ {
+				sumPoints = sumPoints + allPoints[countI].Point
+			}
+
+			oneUserOut.Id = user[cUs].Id
+			oneUserOut.Name = user[cUs].Name
+			oneUserOut.Email = user[cUs].Email
+			oneUserOut.Phone = user[cUs].Phone
+			oneUserOut.Address = user[cUs].Address
+			oneUserOut.TotalPoints = sumPoints
+
+			usersOut = append(usersOut, oneUserOut)
+		}
+
+		c.JSON(http.StatusOK, usersOut)
 	}
 }
 
@@ -83,5 +121,24 @@ func DeleteUser(c *gin.Context) {
 		c.AbortWithStatus(http.StatusNotFound)
 	} else {
 		c.JSON(http.StatusOK, gin.H{"id" + strconv.Itoa(id): "is deleted"})
+	}
+}
+
+//GetUserChallengesByUID ... Get all user challenges by UID
+func GetUserChallengesByUID(c *gin.Context) {
+	id, errUser := strconv.Atoi(c.Params.ByName("id"))
+	if errUser != nil {
+		fmt.Println(errUser.Error())
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+	var challenges []Models.ChallengeUser
+	err := Models.GetUserChallengesByUID(&challenges, id)
+	if err != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+	} else {
+		var outC CResp
+		outC.TotalChallenges = len(challenges)
+		outC.Challenges = challenges
+		c.JSON(http.StatusOK, outC)
 	}
 }

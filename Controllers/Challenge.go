@@ -20,6 +20,22 @@ func GetChallenges(c *gin.Context) {
 	}
 }
 
+//GetChallengeByID ... Get one Challenge
+func GetChallengeByID(c *gin.Context) {
+	var cid, err = strconv.Atoi(c.Params.ByName("id"))
+	if err != nil {
+		fmt.Println(err.Error())
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+	var challenge Models.Challenge
+	err1 := Models.GetChallengeByID(&challenge, cid)
+	if err1 != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+	} else {
+		c.JSON(http.StatusOK, challenge)
+	}
+}
+
 //AddChallenge ... Create Challenge
 func AddChallenge(c *gin.Context) {
 

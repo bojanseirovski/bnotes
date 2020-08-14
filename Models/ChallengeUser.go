@@ -21,3 +21,11 @@ func GetByChallengeID(challengeuser *[]ChallengeUser, id int) (err error) {
 	}
 	return nil
 }
+
+//GetUserChallengesByUID ... Fetch user challenges by UID
+func GetUserChallengesByUID(cchallengeuser *[]ChallengeUser, id int) (err error) {
+	if err = Config.DB.Where("uid = ?", id).First(cchallengeuser).Error; err != nil {
+		return err
+	}
+	return nil
+}
