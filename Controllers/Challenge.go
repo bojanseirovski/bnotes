@@ -149,3 +149,46 @@ func GetChallengeUserPoints(c *gin.Context) {
 	}
 
 }
+
+//GetTotalChallengePoints ... Get all challenge points from all users
+func GetTotalChallengePoints(c *gin.Context) {
+	var id, err = strconv.Atoi(c.Params.ByName("id"))
+	if err != nil {
+		fmt.Println(err.Error())
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+
+	var challenge Models.Challenge
+	var points []Models.Point
+	var chalUser []Models.ChallengeUser
+
+	var uids []int
+
+	//	get and veify the challenge
+	errChallenge := Models.GetChallengeByID(&challenge, id)
+	if errChallenge != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+
+	errUids := Models.GetByChallengeID(&chalUser, id)
+	if errUids != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+	}
+
+	for countCu := 0; countCu < len(chalUser)-1; countCu++ {
+		uids = append(uids, chalUser[countCu].UID)
+	}
+
+	//	get all points for the user between challenge dates
+	errPoints := Models.GetPointsByUIDs(&points, uids)
+	if errPoints != nil {
+		c.AbortWithStatus(http.StatusNotFound)
+	} else {
+		var sumPoint int
+		for countI := 0; countI < len(points)-1; countI++ {
+			sumPoint += points[countI].Point
+		}
+		c.JSON(http.StatusOK, gin.H{"points": sumPoint})
+	}
+
+}

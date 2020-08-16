@@ -42,7 +42,7 @@ func SetupRouter() *gin.Engine {
 		//	list all user points for challenge
 		grp1.GET("challenge/:id/user/:uid", Controllers.GetChallengeUserPoints)
 		//	list total challenge points
-		grp1.GET("challenge/:id/points", Controllers.GetPoints)
+		grp1.GET("challenge/:id/points", Controllers.GetTotalChallengePoints)
 	}
 	return r
 }
